@@ -1,5 +1,5 @@
-"Inicia o programa todo"
 (defun Start()
+"Função para iniciar o programa todo"
 	(progn
 		(let ((path (Insert-diretory)))
 			  (compile-files path)
@@ -7,16 +7,16 @@
 	)
 )
 
-"Pede o diretorio em que queres trabalhar"
-(defun Insert-diretory() 
+(defun Insert-diretory()
+"Função para colocar qual o path, em que está os ficheiros" 
     (progn
         (format t "Path para o diretorio dos ficheiros de processamento - ")
         (format nil (read-line))
     )
 )
 
-"Compila os 2 ficheiros de processamento que temos"
 (defun compile-files (path)
+"Função que compila os ficheiros necessários localizados na path fornecida "
                 (progn 
                     (compile-file (concatenate 'string path "\\puzzle.lisp"))
                     (compile-file (concatenate 'string path "\\procura.lisp"))
@@ -24,8 +24,8 @@
                )
 )
 
-"Faz load do resultado do compilamento dos ficheiros de processamento"
 (defun load-files (path)
+"Função que faz o load dos ficheiros criados pela função compile-files"
                 (progn 
                     (load (concatenate 'string path "\\puzzle.64ofasl")) 
                     (load (concatenate 'string path "\\procura.64ofasl"))
@@ -34,9 +34,8 @@
 )
 
 
-
-"Menu Principal para depois de importar todos os ficheiro"
 (defun Menu (path)
+"Menu Principal da Aplicação"
 	(loop	
 		(progn
             (format t "~%~%~%~%~%MENU~%")
@@ -65,7 +64,8 @@
 )
 
 ;; Start-search 
-(defun Start-search (path) 
+(defun Start-search (path)
+"Função que inicia a Procura" 
 	(let* 	(	(algoritmo 						(read-algorithm))
 				(numero-objectivo-caixas  		(read-num-boxes-close))
 				(heuristica 					(cond ((not (or (eql algoritmo 'dfs) (eql algoritmo 'bfs))) (read-heuristic)) (T nil)))
@@ -96,6 +96,7 @@
 
 ;; read-tab
 (defun read-tab (path)
+"Função que lêm um tabuleiro do Ficheiro problemas.dat, encontrado na path" 
     (progn
         (format t "~%> Escolhe o problema") 
         (format t "~%> Problema 1 (A) - Objetivo Fechar 3 caixas")
@@ -123,6 +124,7 @@
 
 
 (defun read-num-boxes-close ()
+"Função que realiza a leitura do nr de caixas que o utilizador quer fechar no tabuleiro" 
 	(progn
 		(format t "~% - Nr de caixas para fechar?")
 		(format t "~% ")
@@ -136,6 +138,7 @@
 
 
 (defun read-algorithm ()
+"Função que realiza a leitura de qual algoritmo aplicar no tabuleiro" 
 	(progn
 		(format t "~% - Escolha o algoritmo")
 		(format t "~% - bfs")
@@ -159,7 +162,8 @@
 	)
 )
 
-(defun read-heuristic () 
+(defun read-heuristic ()
+"Função que realiza a leitura de qual heuristica aplicar ao algoritmo a*" 
 	(progn
 		(format t "~% Escolha a heuristica") 
 		(format t "~% 	1 - h(x)= o(x) - c(x)")
@@ -184,7 +188,8 @@
 	)
 )
 
-(defun read-depth () 
+(defun read-depth ()
+"Função que realiza a leitura de qual profundidade máxiam que se aplica ao algoritmo dfs"  
 	(progn
 		(format t "~% Qual a profundidade que pretende ?")
 		(format t "~% ")
@@ -203,7 +208,7 @@
 )
 
 (defun results (no-inicial profundidade-maxima algoritmo heuristica solucao diretoria)
-
+"Função que permite mostrar os resultados obtidos no listener" 
 	(let* 
 		(
 			(no-solucao (caar solucao))
@@ -238,6 +243,7 @@
 )
 
 (defun write-results-file (no-inicial profundidade-maxima algoritmo heuristica solucao diretoria)
+"Função que armazena os resultados obtidos num ficheiro chamado estatisticas.dat, localizado na path fornecida" 
 (let* 
 		(
 			(no-solucao (caar solucao))
@@ -272,6 +278,7 @@
 )
 
 (defun lista-exists (elemento lista)
+"Função auxiliar usada para verificar se um elemento existe numa determinada lista"
 	(cond
 		((null lista) nil)
 		((eql elemento (car lista)) T)
@@ -279,7 +286,8 @@
 	)
 )
 
-(defun current-date-string () "Retorna a data no formato de string"
+(defun current-date-string () 
+"Retorna a data no formato de string"
 	(multiple-value-bind (sec min hr dow dst-p tz)
 		(get-decoded-time)
 		(declare (ignore dow dst-p tz))	

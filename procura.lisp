@@ -1,4 +1,5 @@
 (defun auxiliar-check-already-in-close-or-open(no &optional (abertos nil) (fechados nil))
+"Função auxiliar que retorna o no se não existir na lista de fechados e de abertos,e caso exista retorna nil,recebe por parâmetros um nó e, opcionalmente uma lista de nós abertos e de nós fechados"
   (cond
    ((and (null abertos) (null fechados)) no) ;The no was never explored
    ((or (equal (car no) (car abertos)) (equal (car no) (car(car fechados)))) nil) ;The no is alredy explored or to explore 
@@ -7,6 +8,7 @@
 )
 
 (defun check-auxiliar-check-for-all-sucessores(sucessores &optional (abertos nil) (fechados nil))
+"Função auxiliar que retorna os nós que nunca foram explorados ou que irão ser explorados, recebe a lista de póssiveis sucessores, e opcionalmente,uma lista com os nós abertos e nó fechados"
   (cond
    ((null sucessores) nil);in case the sucessores are empty
    (t (cons (auxiliar-check-already-in-close-or-open (car sucessores) abertos fechados) (check-auxiliar-check-for-all-sucessores (cdr sucessores) abertos fechados))) ;recursive call
@@ -14,6 +16,7 @@
 )
 
 (defun bfs (no-init solution sucessores opera &optional (aberto nil) (fechado nil))
+"Função usada para calcular o melhor resultado utilizando o algoritmo BFS.Recebe por parâmetros o nó-inicial, a função para calcular a solução, a função para calcular os sucessores, uma lista com as operações usadas nos sucessores, e opcionalmente a lista de nós abertos e a lista de nós fechados"
   (let* ((sucess (funcall sucessores no-init opera))
     (actual-sucess (check-auxiliar-check-for-all-sucessores sucess aberto fechado)))
   (cond ((funcall solution no-init) (list no-init aberto fechado))
@@ -23,6 +26,7 @@
 )
 
 (defun dfs (no-init solution sucessores opera max &optional (aberto nil) (fechado nil))
+"Função usada para calcular o melhor resultado utilizando o algoritmo DFS.Recebe por parâmetros o nó-inicial, a função para calcular a solução, a função para calcular os sucessores, uma lista com as operações usadas nos sucessores, qual a profundidade máxima, e opcionalmente a lista de nós abertos e a lista de nós fechados"
   (cond ((null no-init) nil)
   (t(let* ((sucess (funcall sucessores no-init opera))
     (actual-sucess (check-auxiliar-check-for-all-sucessores sucess aberto fechado)))
@@ -35,19 +39,22 @@
 )
 
 (defun no-profundidade (no)
+"Função auxiliar para descobrir a profundidade de um nó"
   (Second no)
  )
 
 
 (defun auxiliar-check-already-in-close-or-open-for-a(no &optional (abertos nil) (fechados nil))
+"Função auxiliar que retorna o no se não existir na lista de fechados,e caso exista retorna nil,recebe por parâmetros um nó e, opcionalmente uma lista de nós abertos e de nós fechados"
   (cond
    ((and (null abertos) (null fechados)) no) ;The no was never explored
-   ((equal (car no) (car(car fechados))) nil) ;The no is alredy explored or to explore 
+   ((equal (car no) (car(car fechados))) nil) ;The no is alredy explored 
    (t (auxiliar-check-already-in-close-or-open no (cdr abertos) (cdr fechados))) ;Recursively to check the rest of abertos e fechados
    )
 )
 
 (defun check-auxiliar-check-for-all-sucessores-for-a(sucessores &optional (abertos nil) (fechados nil))
+"Função auxiliar que retorna os nós que nunca foram explorados, recebe a lista de póssiveis sucessores, e opcionalmente,uma lista com os nós abertos e nó fechados"
   (cond
    ((null sucessores) nil);in case the sucessores are empty
    (t (cons (auxiliar-check-already-in-close-or-open (car sucessores) abertos fechados) (check-auxiliar-check-for-all-sucessores (cdr sucessores) abertos fechados))) ;recursive call
@@ -56,6 +63,7 @@
 
 
 (defun a-star(no-init solution sucessores opera heu &optional (aberto nil) (fechado nil))
+"Função usada para calcular o melhor resultado utilizando o algoritmo A*.Recebe por parâmetros o nó-inicial, a função para calcular a solução, a função para calcular os sucessores, uma lista com as operações usadas nos sucessores, qual a heuristica utilizada, e opcionalmente a lista de nós abertos e a lista de nós fechados"
  (let* ((sucess (funcall sucessores no-init opera heu))
     		(actual-sucess (check-auxiliar-check-for-all-sucessores-for-a sucess aberto fechado)))
     		(cond ((funcall solution no-init) (list no-init aberto fechado))
@@ -67,9 +75,12 @@
 )
 
 (defun sort-lista (list)
+"Função auxiliar para ordernar uma lista pelo seu custo (profundidade + valor heuristica)"
   (sort list #'< :key (lambda (x) (+ (third x) (second x)))))
   
-  (defun ida-star (no-init solution sucessores opera max-heur heu &optional (lista-sucess nil) (no-root nil))
+  
+(defun ida-star (no-init solution sucessores opera max-heur heu &optional (lista-sucess nil) (no-root nil))
+"Função usada para calcular o melhor resultado utilizando o algoritmo IDA*.Recebe por parâmetros o nó-inicial, a função para calcular a solução, a função para calcular os sucessores, uma lista com as operações usadas nos sucessores,qual o limite, qual a heuristica utilizada, e opcionalmente a lista de nós abertos e o nó raiz"
    (let* ((sucess (funcall sucessores no-init opera heu)))
             (cond ((funcall solution no-init) (list no-init max-heur))
                       ((< max-heur (+ (third no-init) (second no-init))) (ida-star no-root solution sucessores opera (+ (second no-init)(third no-init)) heu))
@@ -81,11 +92,13 @@
 )
 
 (defun penetrancia (no nos-gerados)
+"Função usada para calcular a penetrancia, recebe como parâmetros, o no-resultado e o nº de nós gerados"
     (cond
         ((not (=  nos-gerados 0)) (float (/ (no-profundidade no)  nos-gerados)))
     )
 )
 
 (defun ramification-factor(length-of-path total-nos)
+"Função usada para calcular o fator de ramificação, recebe como parâmetros, o tamanho do caminho e o nº de nós totais"
   (* (/ total-nos (- total-nos 1)) (- (expt total-nos length-of-path) 1))
 )
