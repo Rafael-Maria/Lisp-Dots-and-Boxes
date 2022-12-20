@@ -1,0 +1,5 @@
+Comments
+Ask about the ramification factor
+Time in statistics
+Tecnical Manual
+Extras- Refactoring, other algorithms, clean-up resultados
