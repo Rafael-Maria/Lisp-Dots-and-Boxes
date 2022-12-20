@@ -38,11 +38,6 @@
   )
 )
 
-(defun no-profundidade (no)
-"Função auxiliar para descobrir a profundidade de um nó"
-  (Second no)
- )
-
 
 (defun auxiliar-check-already-in-close-or-open-for-a(no &optional (abertos nil) (fechados nil))
 "Função auxiliar que retorna o no se não existir na lista de fechados,e caso exista retorna nil,recebe por parâmetros um nó e, opcionalmente uma lista de nós abertos e de nós fechados"

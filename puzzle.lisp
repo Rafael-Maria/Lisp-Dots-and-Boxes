@@ -91,7 +91,7 @@
 )
 
 ;profundidade do no
-(defun tab-prof (no)
+(defun no-profundidade(no)
 "Função que retorna a profundidade de um nó"
   (Second no)
 )
@@ -99,8 +99,8 @@
 (defun new-sucessor-verti(no collum position &optional (heu nil))
 "Função que retorna um novo sucessor, em que foi alterado uma arco vertical"
 	(cond
-		((null heu) (list (arco-vertical collum position no) (+ 1(tab-prof no)) heu (car no) (car (reverse no))))
-  		(t (list (arco-vertical collum position no) (+ 1(tab-prof no)) (funcall heu (arco-vertical collum position no) (car (reverse no))) (car no) (car (reverse no))))
+		((null heu) (list (arco-vertical collum position no) (+ 1(no-profundidade no)) heu (car no) (car (reverse no))))
+  		(t (list (arco-vertical collum position no) (+ 1(no-profundidade no)) (funcall heu (arco-vertical collum position no) (car (reverse no))) (car no) (car (reverse no))))
 	)
 )
 
@@ -123,8 +123,8 @@
 (defun new-sucessor-hori(no line position &optional (heu nil))
 "Função que retorna um novo sucessor, em que foi alterado uma arco horizontal, recebe o no-pai, a linha e a posição para alterar no tabuleiro e opcionalmente a heuristica"
 	(cond
-		((null heu) (list (arco-horizontal line position no) (+ 1(tab-prof no)) heu (car no) (car (reverse no))))
- 	 	(t (list (arco-horizontal line position no) (+ 1(tab-prof no)) (funcall heu (arco-horizontal line position no) (car (reverse no))) (car no) (car (reverse no))))
+		((null heu) (list (arco-horizontal line position no) (+ 1(no-profundidade no)) heu (car no) (car (reverse no))))
+ 	 	(t (list (arco-horizontal line position no) (+ 1(no-profundidade no)) (funcall heu (arco-horizontal line position no) (car (reverse no))) (car no) (car (reverse no))))
 	)
 )
 
@@ -153,8 +153,8 @@
   "Função auxiliar da heuristica proposta por nós, que permite verificar a 1 e última posição de cada linha/coluna, por arcos. recebe por parametros, um lado do Tabuleiro e opcionalmente a linha/coluna (Nota o valor default da line é 2, pois já foi somado préviamente as bordas todas, fazendo assim que não exista somas repetidas)"
   (cond
       ((= line (length tab-side)) 0)
-      ((and (= 1 (get-arco-na-posicao line  1 tab-side)) (= 1 (get-arco-na-posicao line  (length (car tab-side)) tab-side))) (+ 2 (heuristica-extra-aux tab-side line)))
-      ((or (= 1 (get-arco-na-posicao line  1 tab-side)) (= 1 (get-arco-na-posicao line  (length (car tab-side)) tab-side))) (+ 1 (heuristica-extra-aux tab-side line)))
+      ((and (= 1 (get-arco-na-posicao line  1 tab-side)) (= 1 (get-arco-na-posicao line  (length (car tab-side)) tab-side))) (+ 2 (heuristica-extra-aux tab-side (+ 1 line))))
+      ((or (= 1 (get-arco-na-posicao line  1 tab-side)) (= 1 (get-arco-na-posicao line  (length (car tab-side)) tab-side))) (+ 1 (heuristica-extra-aux tab-side (+ 1 line))))
       (t (heuristica-extra-aux tab-side (+ 1 line)))
   )
 )
@@ -167,7 +167,7 @@
 (defun caminho(no-final lista-fechados)
 "Função que retorna o caminho necessário do nó-raiz até o nó objetico, recebe por parametros o nó final e a lista de nós fechados"
   (cond ((null no-final) '())
-        (t (append (caminho (find-the-no-from-fechados (no-pai no-final) (- (tab-prof no-final) 1) lista-fechados) lista-fechados) (list(car no-final))))
+        (t (append (caminho (find-the-no-from-fechados (no-pai no-final) (- (no-profundidade no-final) 1) lista-fechados) lista-fechados) (list(car no-final))))
   )
 )
 
@@ -175,7 +175,7 @@
 "Função auxiliar de caminho que retorna um nó de tabuleiro caso exista na lista de fechados,recebe por parâmetro um tabuleiro, a profundidade, e uma lista de nós fechados"
   (cond
    ((null lista-fechados) nil)
-   ((and(equal(car (car lista-fechados)) tab) (equal(tab-prof (car lista-fechados)) prof)) (car lista-fechados))
+   ((and(equal(car (car lista-fechados)) tab) (equal(no-profundidade (car lista-fechados)) prof)) (car lista-fechados))
    (t (find-the-no-from-fechados tab prof (cdr lista-fechados)))
    )
 )
