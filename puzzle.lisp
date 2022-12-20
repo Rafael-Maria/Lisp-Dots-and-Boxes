@@ -139,6 +139,25 @@
   )
 )
 
+(defun no-pai (no)
+  (Fourth no)
+)
+
+(defun caminho(no-final lista-fechados)
+  (cond ((null no-final) '())
+        (t (append (caminho (find-the-no-from-fechados (no-pai no-final) (- (tab-prof no-final) 1) lista-fechados) lista-fechados) (list(car no-final))))
+  )
+)
+
+(defun find-the-no-from-fechados(tab prof lista-fechados)
+  (cond
+   ((null lista-fechados) nil)
+   ((and(equal(car (car lista-fechados)) tab) (equal(tab-prof (car lista-fechados)) prof)) (car lista-fechados))
+   (t (find-the-no-from-fechados tab prof (cdr lista-fechados)))
+   )
+)
+
+
 (defun tabuleiro-teste ()
   "Retorna um tabuleiro 3x3 (3 arcos na vertical por 3 arcos na horizontal)"
     '(

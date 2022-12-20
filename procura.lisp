@@ -79,3 +79,13 @@
                )
    ) 
 )
+
+(defun penetrancia (no nos-gerados)
+    (cond
+        ((not (=  nos-gerados 0)) (float (/ (no-profundidade no)  nos-gerados)))
+    )
+)
+
+(defun ramification-factor(length-of-path total-nos)
+  (* (/ total-nos (- total-nos 1)) (- (expt total-nos length-of-path) 1))
+)
