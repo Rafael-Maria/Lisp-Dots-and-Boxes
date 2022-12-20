@@ -1,3 +1,4 @@
+;__________________________________________INICIO_________________________
 (defun Start()
 "Função para iniciar o programa todo"
 	(progn
@@ -33,7 +34,7 @@
                )
 )
 
-
+;_____________________________________________________Menus_________________________________
 (defun Menu (path)
 "Menu Principal da Aplicação"
 	(loop	
@@ -94,7 +95,7 @@
 )
 
 
-;; read-tab
+;____________________________________________________LEITURAS________________________________________
 (defun read-tab (path)
 "Função que lêm um tabuleiro do Ficheiro problemas.dat, encontrado na path" 
     (progn
@@ -207,6 +208,8 @@
 	)
 )
 
+
+;_______________________________________________________________________________Resultados______________________________________________________________
 (defun results (no-inicial profundidade-maxima algoritmo heuristica solucao diretoria tempo-inicial)
 "Função que permite mostrar os resultados obtidos no listener" 
 	(let* 
@@ -273,14 +276,6 @@
 	)
 )
 
-(defun current-date-string () 
-"Retorna a data no formato de string"
-	(multiple-value-bind (sec min hr dow dst-p tz)
-		(get-decoded-time)
-		(declare (ignore dow dst-p tz))	
-		(format nil "~A-~A-~A " hr min sec)
-	)
-)
 
 
 

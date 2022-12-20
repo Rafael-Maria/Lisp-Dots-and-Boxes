@@ -1,4 +1,4 @@
-
+;_____________________________________operações do tabuleiro_______________________________
 (defun get-arcos-horizontais (tab)
   "Função para receber os arcos-horizontais de um tabuleiro"
   (car tab)
@@ -51,10 +51,30 @@
   )
 )
 
+(defun num-boxes(tab &optional (line 1) (position 1))
+"Função que retorna o nr de caixas de um determinado tabuleiro, (usa a dica fornecida no moodle)"
+  (cond
+     ((= line (length (get-arcos-horizontais tab))) 0)
+     ((and (= 1 (get-arco-na-posicao line  position (get-arcos-horizontais tab))) (= 1 (get-arco-na-posicao (+ 1 line)  position (get-arcos-horizontais tab))) (= 1 (get-arco-na-posicao position line(get-arcos-verticais tab))) (= 1 (get-arco-na-posicao (+ 1 position) line (get-arcos-verticais tab)))) 
+                      (cond
+                          ((= position (length (car(get-arcos-horizontais tab)))) (+ 1 (num-boxes tab (+ 1 line) 1)))
+                          (t (+ 1(num-boxes tab line (+ 1 position))))
+                          )
+                    )
+     ((= position (length (car(get-arcos-horizontais tab)))) (num-boxes tab (+ 1 line) 1))
+     (t (num-boxes tab line (+ 1 position)))
+  )
+)
 
-(defun heuristica(no value)
-"Função da heuristica fornecida pelo prof, nr de caixas que falta fechar = objetivo de caixas (value) - nr de caixas no nó atual"
-        (- value (num-boxes no))
+;_________________________________________________Operações do nó____________________________________________
+(defun no-profundidade(no)
+"Função que retorna a profundidade de um nó"
+  (Second no)
+)
+
+(defun no-pai (no)
+"Função que retorna o tabuleiro pai de um nó"
+  (Fourth no)
 )
 
 (defun start-no (tab value &optional (heu nil))
@@ -63,6 +83,23 @@
 		((null heu) (list tab 0  nil nil value))
   		(t (list tab 0  (funcall heu tab value) nil value))
 	)
+)
+
+
+(defun caminho(no-final lista-fechados)
+"Função que retorna o caminho necessário do nó-raiz até o nó objetico, recebe por parametros o nó final e a lista de nós fechados"
+  (cond ((null no-final) '())
+        (t (append (caminho (find-the-no-from-fechados (no-pai no-final) (- (no-profundidade no-final) 1) lista-fechados) lista-fechados) (list(car no-final))))
+  )
+)
+
+(defun find-the-no-from-fechados(tab prof lista-fechados)
+"Função auxiliar de caminho que retorna um nó de tabuleiro caso exista na lista de fechados,recebe por parâmetro um tabuleiro, a profundidade, e uma lista de nós fechados"
+  (cond
+   ((null lista-fechados) nil)
+   ((and(equal(car (car lista-fechados)) tab) (equal(no-profundidade (car lista-fechados)) prof)) (car lista-fechados))
+   (t (find-the-no-from-fechados tab prof (cdr lista-fechados)))
+   )
 )
 
 
@@ -90,11 +127,6 @@
    )
 )
 
-;profundidade do no
-(defun no-profundidade(no)
-"Função que retorna a profundidade de um nó"
-  (Second no)
-)
 
 (defun new-sucessor-verti(no collum position &optional (heu nil))
 "Função que retorna um novo sucessor, em que foi alterado uma arco vertical"
@@ -128,19 +160,10 @@
 	)
 )
 
-(defun num-boxes(tab &optional (line 1) (position 1))
-"Função que retorna o nr de caixas de um determinado tabuleiro, (usa a dica fornecida no moodle)"
-  (cond
-     ((= line (length (get-arcos-horizontais tab))) 0)
-     ((and (= 1 (get-arco-na-posicao line  position (get-arcos-horizontais tab))) (= 1 (get-arco-na-posicao (+ 1 line)  position (get-arcos-horizontais tab))) (= 1 (get-arco-na-posicao position line(get-arcos-verticais tab))) (= 1 (get-arco-na-posicao (+ 1 position) line (get-arcos-verticais tab)))) 
-                      (cond
-                          ((= position (length (car(get-arcos-horizontais tab)))) (+ 1 (num-boxes tab (+ 1 line) 1)))
-                          (t (+ 1(num-boxes tab line (+ 1 position))))
-                          )
-                    )
-     ((= position (length (car(get-arcos-horizontais tab)))) (num-boxes tab (+ 1 line) 1))
-     (t (num-boxes tab line (+ 1 position)))
-  )
+;______________________________________________________Heuristica___________________________________________________________
+(defun heuristica(no value)
+"Função da heuristica fornecida pelo prof, nr de caixas que falta fechar = objetivo de caixas (value) - nr de caixas no nó atual"
+        (- value (num-boxes no))
 )
 
 (defun heuristica-extra (tab value)
@@ -148,7 +171,6 @@
          (+ (heuristica-extra-aux (get-arcos-horizontais tab)) (heuristica-extra-aux (get-arcos-verticais tab)) (apply #'+ (car (get-arcos-horizontais tab))) (apply #'+ (car (reverse(get-arcos-horizontais tab)))) (apply #'+ (car (get-arcos-verticais tab))) (apply #'+ (car (reverse(get-arcos-verticais tab)))) (- value (num-boxes tab)))
 )
 
-;Enter tab vertical or horizontal
 (defun heuristica-extra-aux(tab-side &optional (line 2))
   "Função auxiliar da heuristica proposta por nós, que permite verificar a 1 e última posição de cada linha/coluna, por arcos. recebe por parametros, um lado do Tabuleiro e opcionalmente a linha/coluna (Nota o valor default da line é 2, pois já foi somado préviamente as bordas todas, fazendo assim que não exista somas repetidas)"
   (cond
@@ -159,28 +181,8 @@
   )
 )
 
-(defun no-pai (no)
-"Função que retorna o tabuleiro pai de um nó"
-  (Fourth no)
-)
 
-(defun caminho(no-final lista-fechados)
-"Função que retorna o caminho necessário do nó-raiz até o nó objetico, recebe por parametros o nó final e a lista de nós fechados"
-  (cond ((null no-final) '())
-        (t (append (caminho (find-the-no-from-fechados (no-pai no-final) (- (no-profundidade no-final) 1) lista-fechados) lista-fechados) (list(car no-final))))
-  )
-)
-
-(defun find-the-no-from-fechados(tab prof lista-fechados)
-"Função auxiliar de caminho que retorna um nó de tabuleiro caso exista na lista de fechados,recebe por parâmetro um tabuleiro, a profundidade, e uma lista de nós fechados"
-  (cond
-   ((null lista-fechados) nil)
-   ((and(equal(car (car lista-fechados)) tab) (equal(no-profundidade (car lista-fechados)) prof)) (car lista-fechados))
-   (t (find-the-no-from-fechados tab prof (cdr lista-fechados)))
-   )
-)
-
-
+;____________________________________________________________________Testes________________________________
 (defun tabuleiro-teste ()
   "Retorna um tabuleiro 3x3 (3 arcos na vertical por 3 arcos na horizontal) para a realização de testes, sem a interface de utilizador"
     '(
