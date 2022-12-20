@@ -67,18 +67,18 @@
 (defun Start-search (path)
 "Função que inicia a Procura" 
 	(let* 	(	(algoritmo 						(read-algorithm))
+                        (tab (read-tab path))
 				(numero-objectivo-caixas  		(read-num-boxes-close))
 				(heuristica 					(cond ((not (or (eql algoritmo 'dfs) (eql algoritmo 'bfs))) (read-heuristic)) (T nil)))
-				(no 							(start-no (read-tab path) numero-objectivo-caixas heuristica))
+				(no 							(start-no tab numero-objectivo-caixas heuristica))
 				(profundidade 					(cond ((eql algoritmo 'dfs) (read-depth)) (T nil)))
-				(tempo-inicial 					(get-internal-real-time))
+				(tempo-inicial 					(get-internal-run-time))
 				(solucao 						(cond 
 												((equal algoritmo 'dfs)  (funcall algoritmo no 'solution-found 'sucessores '(insert-vertical-sucessor-tab insert-horizontal-sucessor-tab) profundidade))
 												((equal algoritmo 'a-star)  (funcall algoritmo no 'solution-found 'sucessores '(insert-vertical-sucessor-tab insert-horizontal-sucessor-tab) heuristica))
 												(t  (bfs no 'solution-found 'sucessores '(insert-vertical-sucessor-tab insert-horizontal-sucessor-tab)))
 				)
 				)
-				(tempo-final(- (get-internal-real-time) tempo-inicial))
 				
 				
 
@@ -87,7 +87,7 @@
 				((null solucao) (format t "~%Nao tem resultado~%"))
 				
 				(T
-					(results no profundidade algoritmo heuristica solucao path)
+					(results no profundidade algoritmo heuristica solucao path tempo-inicial)
 				)
 			)
 	)
@@ -207,10 +207,11 @@
 	)
 )
 
-(defun results (no-inicial profundidade-maxima algoritmo heuristica solucao diretoria)
+(defun results (no-inicial profundidade-maxima algoritmo heuristica solucao diretoria tempo-inicial)
 "Função que permite mostrar os resultados obtidos no listener" 
 	(let* 
 		(
+                 (tempo (- (get-internal-run-time) tempo-inicial))
 			(no-solucao (caar solucao))
 			(lista-fechados (car (reverse solucao)))
 			(tamanho-lista-fechados (length lista-fechados))
@@ -218,7 +219,7 @@
 			(profundidade (second (car solucao)))
 			(path (caminho (car solucao) lista-fechados))
 			(valor-heuristico (cond ((not(numberp (third (car solucao))))0) (T(third (car solucao)))))
-			(ramificacao (ramification-factor (length path) tamanho-lista-fechados))
+			(ramificacao (ramification-factor (length path) nos-gerados))
 		)	
 		
 		(format t "~%_________________________________________________________~%"  )
@@ -236,27 +237,15 @@
 		(format t "~%Caminho ate solucao: ~s ~%" path)
 		(format t "~%Tamanho da lista: ~s ~%" tamanho-lista-fechados)
 		(format t "~%Fator de ramificacao: ~s ~%" ramificacao)
-		;(format t "~%TEMPO: ~s ~%" tempo-algoritmo)
+		(format t "~%TEMPO: ~s ~%" tempo)
 		;(format t "~%Caixas Ftempo-inicialechadas: ~s ~%" (caixas-fechadas (get-no-estado no-final)))
-        (write-results-file no-inicial profundidade-maxima algoritmo heuristica solucao diretoria)
+        (write-results-file no-inicial profundidade-maxima algoritmo heuristica solucao diretoria tempo no-solucao lista-fechados tamanho-lista-fechados nos-gerados profundidade path valor-heuristico ramificacao)
 	)
 )
 
-(defun write-results-file (no-inicial profundidade-maxima algoritmo heuristica solucao diretoria)
+(defun write-results-file (no-inicial profundidade-maxima algoritmo heuristica solucao diretoria tempo no-solucao lista-fechados tamanho-lista-fechados nos-gerados profundidade path valor-heuristico ramificacao)
 "Função que armazena os resultados obtidos num ficheiro chamado estatisticas.dat, localizado na path fornecida" 
-(let* 
-		(
-			(no-solucao (caar solucao))
-			(lista-fechados (car (reverse solucao)))
-			(tamanho-lista-fechados (length lista-fechados))
-			(nos-gerados (+ tamanho-lista-fechados (length (nth 1 solucao))))
-			(profundidade (second (car solucao)))
-			(path (caminho (car solucao) lista-fechados))
-			(valor-heuristico (cond ((not(numberp (third (car solucao))))0) (T(third (car solucao)))))
-			(ramificacao (ramification-factor (length path) tamanho-lista-fechados))
-		)
-						
-		(with-open-file (ficheiro (concatenate 'string diretoria "\\estatisticas.dat") :direction :output :if-exists :append :if-does-not-exist :create)
+(with-open-file (ficheiro (concatenate 'string diretoria "\\estatisticas.dat") :direction :output :if-exists :append :if-does-not-exist :create)
 		(format ficheiro "~%_________________________________________________________~%"  )
 		(format ficheiro "~%Estado inicial: ~s ~%"  (car no-inicial))
 		(format ficheiro "~%Estado final: ~s ~%" no-solucao)
@@ -272,9 +261,7 @@
 		(format ficheiro "~%Valor Heuristico do nó final: ~s ~%" valor-heuristico)
 		(format ficheiro "~%Custo: ~s ~%" (+ valor-heuristico profundidade))
 		(format ficheiro "~%Caminho ate solucao: ~s ~%" path)
-		)
-
-)
+                )
 )
 
 (defun lista-exists (elemento lista)

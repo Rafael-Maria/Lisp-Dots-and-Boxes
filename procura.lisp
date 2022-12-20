@@ -100,5 +100,5 @@
 
 (defun ramification-factor(length-of-path total-nos)
 "Função usada para calcular o fator de ramificação, recebe como parâmetros, o tamanho do caminho e o nº de nós totais"
-  (* (/ total-nos (- total-nos 1)) (- (expt total-nos length-of-path) 1))
+	(float(/ total-nos length-of-path))
 )
