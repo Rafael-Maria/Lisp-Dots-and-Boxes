@@ -59,16 +59,27 @@
 )
 
 ;_____________________________________________ALGORITMO IDA_____________________________________________
-(defun ida-star (no-init solution sucessores opera max-heur heu &optional (lista-sucess nil) (no-root nil))
-"Função usada para calcular o melhor resultado utilizando o algoritmo IDA*.Recebe por parâmetros o nó-inicial, a função para calcular a solução, a função para calcular os sucessores, uma lista com as operações usadas nos sucessores,qual o limite, qual a heuristica utilizada, e opcionalmente a lista de nós abertos e o nó raiz"
-   (let* ((sucess (funcall sucessores no-init opera heu)))
-            (cond ((funcall solution no-init) (list no-init max-heur))
-                      ((< max-heur (+ (third no-init) (second no-init))) (ida-star no-root solution sucessores opera (+ (second no-init)(third no-init)) heu))
-                  (T
-                         (ida-star (car (sort-lista (append sucess lista-sucess))) solution sucessores opera max-heur heu (append sucess lista-sucess) no-init)
-                         )
-               )
-   ) 
+(defun ida-star(no-init solution sucessores opera max-heur heu no-root &optional (aberto nil) (fechado nil))
+"Função usada para calcular o melhor resultado utilizando o algoritmo IDA*.Recebe por parâmetros o nó-inicial, a função para calcular a solução, a função para calcular os sucessores, uma lista com as operações usadas nos sucessores,qual o limite, qual a heuristica utilizada, e opcionalmente a lista de nós abertos, fechados e o nó raiz"
+  (let* ((sucess (funcall sucessores no-init opera heu))
+    		(actual-sucess (check-auxiliar-check-for-all-sucessores-for-a sucess aberto fechado)))
+    (cond ((funcall solution no-init) (list no-init aberto fechado))
+          ((and (> max-heur (third no-init)) (null aberto)(null fechado))(ida-star no-root solution sucessores opera (new-max-heur (sort-lista actual-sucess) max-heur) heu no-root actual-sucess))
+          ((and (> max-heur (third no-init)) (null aberto))(ida-star no-root solution sucessores opera (new-max-heur (sort-lista fechado) max-heur) heu no-root))
+          ((> max-heur (third no-init)) (ida-star (car aberto) solution sucessores opera max-heur heu no-root (cdr  aberto) fechado) (cons no-init fechado))
+          (T (ida-star (car (append actual-sucess aberto)) solution sucessores opera max-heur heu no-root (append actual-sucess (cdr aberto)) (cons no-init fechado)))
+          )
+    )
+)
+
+(defun new-max-heur (sorted-list max-heur)
+"Função para descobrir o prox limite"
+ (let ((no-custo (third (car sorted-list))))
+  (cond
+   ((< no-custo max-heur) no-custo)
+   (t (new-max-heur (cdr sorted-list) max-heur))
+   )
+  )
 )
 
 ;________________________________________________AUXILIAR ALGORITMOS(A* e IDA*)___________________________
