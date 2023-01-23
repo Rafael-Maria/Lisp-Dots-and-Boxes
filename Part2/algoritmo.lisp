@@ -19,9 +19,9 @@
 	(cond
 		((null (car sucesslist)) value); Check what to return 
 		(t (let ((valueResult (cond
-                                      ((numberp (last (car sucesslist))) (max value (alphabeta (butlast (car sucesslist)) (- prof 1) min max sucess 1 start-prof)))
+                                      ((numberp (last (car sucesslist))) (max value (alphabeta (butlast (car sucesslist)) (- prof 1) min max sucess 1 start-prof max-time time-start)))
                                       (t (max value (alphabeta (car sucesslist) (- prof 1) min max sucess 2 start-prof max-time time-start))))));
-			(cond ((> valueResult max) valueResult);cut
+			(cond ((>= valueResult max) valueResult);cut
 				(t (alfabeta-max (cdr sucesslist) prof (max min valueResult) max sucess start-prof max-time time-start valueResult)))))
 	)
 )
@@ -39,7 +39,7 @@
 		(t (let ((valueResult (cond
                                       ((numberp (last (car sucesslist))) (min value (alphabeta (butlast (car sucesslist)) (- prof 1) min max sucess 2 start-prof max-time time-start)))
                                       (t (min value (alphabeta (car sucesslist) (- prof 1) min max sucess 1 start-prof max-time time-start))))));
-			(cond ((< valueResult min) valueResult);cut
+			(cond ((<= valueResult min) valueResult);cut
 				(t (alfabeta-min (cdr sucesslist) prof min (min max valueResult) sucess start-prof max-time time-start valueResult)))))
 	)
 )

@@ -151,9 +151,9 @@
 	)
 )
 
-
 (defun get-score(no)
   (car (cdr no))
+)
 
 (defun avaliacao(no)
 (let* ((score (car (cdr no)))
