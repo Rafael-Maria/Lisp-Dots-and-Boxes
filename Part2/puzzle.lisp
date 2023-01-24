@@ -32,7 +32,7 @@
   )
 )
 
-
+;____________________Funcoes usadas em Operadores__________________
 (defun arco-horizontal (fileira arco-pos tabuleiro &optional (value 1))
 "Funcao para criar um novo estado do tabuleiro, com um novo arco horizontal"
   (List (arco-na-posicao fileira arco-pos (get-arcos-horizontais (car tabuleiro)) value)(get-arcos-verticais (car tabuleiro)))
@@ -61,17 +61,26 @@
   )
 )
 
+(defun get-score(no)
+"funcao para obter a pontuacao atual do no"
+  (car (cdr no))
+)
 
 (defun sort-lista (list player)
+"funcao usada para ordernar a lista baseado na avaliacao, e qual jogador está a jogar"
   (cond ((= player 1) (sort list #'> :key (lambda (x) (avaliacao x))))
 	(t(sort list #'< :key (lambda (x) (avaliacao x))))
 	)
 )
+
+;_________________________________Funcao de Sucessores_______________________________
 (defun sucessores-aux (no player)
+"funcao auxiliar dos sucessores (usada para chamar o sucessor sem ser necessário passar os operadores)"
 	(sort-lista (sucessores no '(insert-vertical-sucessor-tab insert-horizontal-sucessor-tab) player) player)
 )
 
 (defun sucessores (no-init opera &optional (player 1))
+"funcao de sucessores usada para obter a lista de sucessores"
   (cond
       ((null opera) nil)
       (t (append (funcall (car opera) no-init 1 1 player) (sucessores no-init (cdr opera) player)))
@@ -79,6 +88,7 @@
 )
 
 (defun insert-vertical-sucessor-tab(no &optional  (collum 1) (position 1) (player 1))
+"funcao usada para inserior os sucessores onde se adicionou um arco vertical ao tabuleiro"
   (cond
    ((> collum (length (get-arcos-verticais (car no)))) nil)
    ((> position (length (car (get-arcos-verticais (car no))))) (insert-vertical-sucessor-tab no (+ 1 collum) 1 player))
@@ -95,6 +105,7 @@
 
 
 (defun new-sucessor-verti(no collum position &optional (player 1))
+"funcao usada para criar um sucessor vertical"
 	(let* ((newtab (arco-vertical collum position no player))
 		(newboxes (num-boxes newtab))
   		(oldboxes (apply '+ (get-score no))))
@@ -116,6 +127,7 @@
 )
 
 (defun insert-horizontal-sucessor-tab(no &optional (line 1) (position 1) (player 1))
+"funcao usada para inserior os sucessores onde se adicionou um arco horizontal ao tabuleiro"
   (cond
    ((> line (length (get-arcos-horizontais(car no))))  nil)
    ((> position (length (car (get-arcos-horizontais (car no))))) (insert-horizontal-sucessor-tab no (+ 1 line) 1 player))
@@ -131,6 +143,7 @@
 )
 
 (defun new-sucessor-hori(no line position &optional (player 1))
+"funcao usada para criar um sucessor horizontal"
 	(let* ((newtab (arco-horizontal line position no player))
 		(newboxes (num-boxes newtab))
 		(oldboxes (apply '+ (get-score no))))
@@ -151,11 +164,9 @@
 	)
 )
 
-(defun get-score(no)
-  (car (cdr no))
-)
-
+;_____________________Funcoes relacionadas ao alfabeta___________________
 (defun avaliacao(no)
+"funcao para obter a avaliacao do no"
 (let* ((score (car (cdr no)))
           (playerone (car score))
           (playertwo (car(cdr score)))
@@ -167,6 +178,7 @@
 )
 
 (defun terminal(tab)
+"funcao para verificar se o no e terminal"
   (cond
       ((terminal-aux (car tab) (car (cdr tab)))t)
       (t nil)
@@ -175,6 +187,7 @@
 
 
 (defun terminal-aux(tab-hori tab-verti)
+"funcao auxiliar na verificacao se o no e terminal"
 	(cond
 		((and (null tab-hori) (null tab-verti))t)
 		((null tab-hori) (and (not(zero-in-list-p (car tab-verti))) (terminal-aux (cdr tab-hori)(cdr tab-verti))))
@@ -185,12 +198,14 @@
 )
 
 (defun zero-in-list-p (list)
+"funcao auxiliar para o no terminal, que verifica se existe zeros numa lista"
   (cond ((null list) nil)
         ((= (car list) 0) t)
         (t (zero-in-list-p (cdr list)))))
 
 
 (defun find-best (evaluation)
+"Funcao que encontra a jogada que deve ser realizada"
 	(let
 		((result-possibility  (car next-sucessor-final)))
 		(cond
@@ -209,6 +224,7 @@
 ;_________________________________________________Nos para Testes____________________________________________
 
 (defun start-no ()
+"no de teste principal"
   (list '(
  (
  (0 0 0 0 0 0)
